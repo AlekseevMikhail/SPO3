@@ -1,0 +1,738 @@
+architecture TestArch {
+
+registers: /* аспекты конфигурации регистров */
+
+	storage ip[32];
+	storage rsp[32];
+
+	storage stack_ptr[32];
+	storage frame_ptr[32];
+
+	storage stdin_storage[32];
+	storage stdout_storage[32];
+
+	view sp = stack_ptr;
+	view fp = frame_ptr;
+
+	view stdin = stdin_storage;
+	view stdout = stdout_storage;
+
+memory: /* аспекты адресных пространств */
+
+	range ram[0x00000000..0xffffffff] {
+		cell = 8;
+		endianess = little-endian;
+		granularity = 0;
+	}
+
+instructions: /* аспекты инструкций */
+
+	encode imm8 field = immediate[8];
+	encode imm2 field = immediate[2];
+	encode ptr field = immediate[32];
+
+	encode reg field = register {
+		sp = 0,
+		fp = 1
+	};
+
+	encode cmp_arg field = cases {
+		eq = 000,
+		ne = 001,
+		lt = 100,
+		le = 101,
+		gt = 110,
+		ge = 111
+	};
+
+// перемещение данных
+
+	instruction const = { 0000 0001, imm8 as n } {
+		// взять n байт следующих за инструкцией
+		// и положить на стек в прямом порядке
+
+		sp = sp - n;
+		// ram[sp..sp+n-1] = ram[ip+2..ip+n+1];
+
+        let i = 0;
+        while i < n do {
+            ram[sp + i] = ram[ip + 2 + i];
+            ++i;
+        }
+
+		ip = ip + n + 2;
+	};
+
+	instruction load  = { 0000 1000, imm8 as n } {
+		// снять со стека указатель и положить на стек n байт,
+		// расположенных по указателю
+
+		// let ptr = ram[sp..sp+3];
+        let ptr = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4 - n;
+		// ram[sp..sp+n-1] = ram[ptr..ptr+n-1];
+
+        let i = 0;
+        while i < n do {
+            ram[sp + i] = ram[ptr + i];
+            ++i;
+        }
+
+		ip = ip + 2;
+	};
+
+	instruction store = { 0000 1010, imm8 as n } {
+		// снять со стека n байт и указатель
+		// и записать в память по указателю n байт
+
+		// let ptr = ram[sp+n..sp+n+3];
+        let ptr = (((((ram[sp + n + 3] << 8) + ram[sp + n + 2]) << 8) + ram[sp + n + 1]) << 8) + ram[sp + n];
+
+		// ram[ptr..ptr+n-1] = ram[sp..sp+n-1];
+
+        let i = 0;
+        while i < n do {
+            ram[ptr + i] = ram[sp + i];
+            ++i;
+        }
+
+		sp = sp + 4 + n;
+
+		ip = ip + 2;
+	};
+
+	instruction get   = { 0000 110, reg as reg } {
+		// положить на стек значение регистра reg
+
+        let value = reg;
+
+		sp = sp - 4;
+		ram[sp + 3] = value >> 24;
+		ram[sp + 2] = (value >> 16) & 0xFF;
+		ram[sp + 1] = (value >> 8) & 0xFF;
+		ram[sp] = value & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction set   = { 0000 111, reg as reg } {
+		// снять со стека значение и записать в регистр reg
+
+        let value = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+		sp = sp + 4;
+
+        reg = value;
+
+		ip = ip + 1;
+	};
+
+// арифметика
+
+	instruction zext  = { 0001 00, imm2 as n } {
+		// снять со стека n-байтное число и дополнить нулями до 32-битного
+
+		// let value = ram[sp..sp+n-1];
+        let value = 0;
+
+        let i = 0;
+        while i < n do {
+            value = value + (ram[sp + i] << (i * 8));
+            ++i;
+        }
+
+		sp = sp + n - 4;
+		// ram[sp..sp+3] = 0x00000000;
+		ram[sp] = 0;
+		ram[sp + 1] = 0;
+		ram[sp + 2] = 0;
+		ram[sp + 3] = 0;
+		// ram[sp-n..sp] = value;
+
+        let j = 0;
+        while j < n do {
+		    ram[sp + j] = (value >> (j * 8)) & 0xFF;
+            ++j;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction sext  = { 0001 01, imm2 as n } {
+		// снять со стека n-байтное число и дополнить знаком до 32-битного
+
+		// let value = ram[sp..sp+n-1];
+        let value = 0;
+
+        let i = 0;
+        while i < n do {
+            value = value + (ram[sp + i] << (i * 8));
+            ++i;
+        }
+
+		let sign = value >> (n * 8 - 1);
+
+		sp = sp + n - 4;
+		// ram[sp..sp+3] = 0xffffffff * sign;
+        if sign then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		// ram[sp-n..sp] = value;
+
+        let j = 0;
+        while j < n do {
+		    ram[sp + j] = (value >> (j * 8)) & 0xFF;
+            ++j;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction trunc = { 0001 10, imm2 as n } {
+		// снять со стека 32-битное число и обрезать до n-байтного
+
+		// let value = ram[sp..sp+3];
+        let value = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4 - n;
+		// ram[sp..sp+n-1] = value[0..n-1]; // little-endian
+
+        let i = 0;
+        while i < n do {
+            ram[sp + i] = value & 0xFF;
+            value = value >> 8;
+            ++i;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction add   = { 0010 0000 } {
+		// снять со стека два 32-битных числа, сложить и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a + b;
+        let result = a + b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction sub   = { 0010 0001 } {
+		// снять со стека два 32-битных числа, вычесть и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a - b;
+        let result = a - b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction mul   = { 0010 0010 } {
+		// снять со стека два 32-битных числа, умножить и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a * b;
+        let result = a * b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction div   = { 0010 0011 } {
+		// снять со стека два 32-битных числа, целочисленно поделить
+		// и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a / b;
+        let result = a / b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction rem   = { 0010 0100 } {
+		// снять со стека два 32-битных числа, взять остаток от деления
+		// и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a % b;
+        let result = a % b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction andb  = { 0011 0000 } {
+		// снять со стека два 32-битных числа, выполнить побитовое И
+		// и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a & b;
+        let result = a & b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction orb   = { 0011 0001 } {
+		// снять со стека два 32-битных числа, выполнить побитовое ИЛИ
+		// и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a | b;
+        let result = a | b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction xorb  = { 0011 0011 } {
+		// снять со стека два 32-битных числа,
+		// выполнить побитовое исключающее ИЛИ и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a ^ b;
+        let result = a ^ b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction shl   = { 0011 0100 } {
+		// снять со стека два 32-битных числа,
+		// выполнить побитовый сдвиг влево и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a << b;
+        let result = a << b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction shr   = { 0011 0101 } {
+		// снять со стека два 32-битных числа,
+		// выполнить побитовый сдвиг вправо и положить на стек
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+
+		sp = sp + 4;
+		// ram[sp..sp+3] = a >> b;
+        let result = a >> b;
+        ram[sp] = result & 0xFF;
+        ram[sp + 1] = (result >> 8) & 0xFF;
+        ram[sp + 2] = (result >> 16) & 0xFF;
+        ram[sp + 3] = (result >> 24) & 0xFF;
+
+		ip = ip + 1;
+	};
+
+	instruction cmp_eq = { 0100 0, cmp_arg.eq } {
+		// снять со стека два 32-битных числа,
+		// выполнить сравнение EQ и положить результат на стек
+		// ИСТИНА = 0xffffffff, ЛОЖЬ = 0x00000000
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+		let result = a == b;
+
+		sp = sp + 4;
+		// if result then
+		// 	ram[sp..sp+3] = 0xffffffff;
+		// else
+		// 	ram[sp..sp+3] = 0x00000000;
+        if result then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction cmp_ne = { 0100 0, cmp_arg.ne } {
+		// снять со стека два 32-битных числа,
+		// выполнить сравнение NE и положить результат на стек
+		// ИСТИНА = 0xffffffff, ЛОЖЬ = 0x00000000
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+		let result = a != b;
+
+		sp = sp + 4;
+		// if result then
+		// 	ram[sp..sp+3] = 0xffffffff;
+		// else
+		// 	ram[sp..sp+3] = 0x00000000;
+        if result then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction cmp_lt = { 0100 0, cmp_arg.lt } {
+		// снять со стека два 32-битных числа,
+		// выполнить сравнение LT и положить результат на стек
+		// ИСТИНА = 0xffffffff, ЛОЖЬ = 0x00000000
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+        if a & 0x80000000 then a = a - 0x100000000;
+        if b & 0x80000000 then b = b - 0x100000000;
+		let result = a < b;
+
+		sp = sp + 4;
+		// if result then
+		// 	ram[sp..sp+3] = 0xffffffff;
+		// else
+		// 	ram[sp..sp+3] = 0x00000000;
+        if result then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction cmp_le = { 0100 0, cmp_arg.le } {
+		// снять со стека два 32-битных числа,
+		// выполнить сравнение LE и положить результат на стек
+		// ИСТИНА = 0xffffffff, ЛОЖЬ = 0x00000000
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+        if a & 0x80000000 then a = a - 0x100000000;
+        if b & 0x80000000 then b = b - 0x100000000;
+		let result = a <= b;
+
+		sp = sp + 4;
+		// if result then
+		// 	ram[sp..sp+3] = 0xffffffff;
+		// else
+		// 	ram[sp..sp+3] = 0x00000000;
+        if result then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction cmp_gt = { 0100 0, cmp_arg.gt } {
+		// снять со стека два 32-битных числа,
+		// выполнить сравнение GT и положить результат на стек
+		// ИСТИНА = 0xffffffff, ЛОЖЬ = 0x00000000
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+        if a & 0x80000000 then a = a - 0x100000000;
+        if b & 0x80000000 then b = b - 0x100000000;
+		let result = a > b;
+
+		sp = sp + 4;
+		// if result then
+		// 	ram[sp..sp+3] = 0xffffffff;
+		// else
+		// 	ram[sp..sp+3] = 0x00000000;
+        if result then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		ip = ip + 1;
+	};
+
+	instruction cmp_ge = { 0100 0, cmp_arg.ge } {
+		// снять со стека два 32-битных числа,
+		// выполнить сравнение GE и положить результат на стек
+		// ИСТИНА = 0xffffffff, ЛОЖЬ = 0x00000000
+
+		// let a = ram[sp+4..sp+7];
+		// let b = ram[sp..sp+3];
+        let a = (((((ram[sp + 7] << 8) + ram[sp + 6]) << 8) + ram[sp + 5]) << 8) + ram[sp + 4];
+        let b = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+        if a & 0x80000000 then a = a - 0x100000000;
+        if b & 0x80000000 then b = b - 0x100000000;
+		let result = a >= b;
+
+		sp = sp + 4;
+		// if result then
+		// 	ram[sp..sp+3] = 0xffffffff;
+		// else
+		// 	ram[sp..sp+3] = 0x00000000;
+        if result then {
+            ram[sp] = 0xFF;
+            ram[sp + 1] = 0xFF;
+            ram[sp + 2] = 0xFF;
+            ram[sp + 3] = 0xFF;
+        } else {
+            ram[sp] = 0;
+            ram[sp + 1] = 0;
+            ram[sp + 2] = 0;
+            ram[sp + 3] = 0;
+        }
+
+		ip = ip + 1;
+	};
+
+// передача управления
+
+	instruction goto = { 1111 0000, ptr as label } {
+		// безусловный переход на label
+		ip = label;
+	};
+
+	instruction ifz  = { 1111 0001, ptr as label } {
+		// снять со стека 32-битное число и перейти на label
+		// если оно равно нулю
+
+		// let value = ram[sp..sp+3];
+        let value = (((((ram[sp + 3] << 8) + ram[sp + 2]) << 8) + ram[sp + 1]) << 8) + ram[sp];
+		sp = sp + 4;
+
+		if value then
+			ip = ip + 5;
+		else
+			ip = label;
+	};
+
+	instruction call = { 1111 0010, ptr as label } {
+		// положить значение ip следующей инструкции на стек адресов возврата
+		// и перейти на label
+
+        let ptr = ip + 5;
+
+		rsp = rsp - 4;
+		// ram[rsp..rsp+3] = ip + 5;
+        ram[rsp] = ptr & 0xFF;
+        ram[rsp + 1] = (ptr >> 8) & 0xFF;
+        ram[rsp + 2] = (ptr >> 16) & 0xFF;
+        ram[rsp + 3] = (ptr >> 24) & 0xFF;
+		ip = label;
+	};
+
+	instruction ret  = { 1111 0011 } {
+		// снять со стека адресов возврата 32-битный указатель и перейти по нему
+
+		// ip = ram[rsp..rsp+3];
+        ip = (((((ram[rsp + 3] << 8) + ram[rsp + 2]) << 8) + ram[rsp + 1]) << 8) + ram[rsp];
+		rsp = rsp + 4;
+	};
+
+	instruction nop  = { 0000 0000 } {
+		// ничего не делать
+		ip = ip + 1;
+	};
+
+	instruction hlt  = { 1111 1111 } {
+		// завершение работы (бесконечный цикл)
+	};
+
+// ввод-вывод
+
+	instruction in  = { 1111 1000 } {
+		// считать значение stdin и положить на стек
+
+		sp = sp - 1;
+		ram[sp] = stdin;
+
+		ip = ip + 1;
+	};
+
+	instruction out = { 1111 1001 } {
+		// снять со стека 1 байт и записать в stdout
+
+		stdout = ram[sp];
+		sp = sp + 1;
+
+		ip = ip + 1;
+	};
+
+mnemonics: /* аспекты мнемоник */
+
+	format plain is "{1}";
+
+// перемещение данных
+
+	mnemonic const(n) plain;
+
+	mnemonic load(n) plain;
+	mnemonic store(n) plain;
+
+	mnemonic get(reg) plain;
+	mnemonic set(reg) plain;
+
+// арифметика
+
+	mnemonic zext(n) plain;
+	mnemonic sext(n) plain;
+	mnemonic trunc(n) plain;
+
+	mnemonic add();
+	mnemonic sub();
+	mnemonic mul();
+	mnemonic div();
+	mnemonic rem();
+
+	mnemonic andb();
+	mnemonic orb();
+	mnemonic xorb();
+
+	mnemonic shl();
+	mnemonic shr();
+
+	mnemonic cmp for cmp_eq() "eq",
+                 for cmp_ne() "ne",
+                 for cmp_lt() "lt",
+                 for cmp_le() "le",
+                 for cmp_gt() "gt",
+                 for cmp_ge() "ge";
+
+// передача управления
+
+	mnemonic goto(label) plain;
+	mnemonic ifz(label) plain;
+
+	mnemonic call(label) plain;
+	mnemonic ret();
+
+	mnemonic nop();
+	mnemonic hlt();
+
+// ввод-вывод
+
+	mnemonic in();
+	mnemonic out();
+}

@@ -1,0 +1,1660 @@
+[section ram]
+	const 4
+	db 0, 0xf0, 0xff, 0xff
+	set sp
+	get sp
+	set fp
+	call main
+	hlt
+; test.in:12
+digit_to_char:
+	get sp
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	get sp
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	add
+	set fp
+	get fp
+; 1: EXPR at 12:28
+.node_1:
+	goto .node_2
+; 2: COND at 13:5
+.node_2:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_4
+	goto .node_3
+; 3: EXPR at 13:17
+.node_3:
+	const 1
+	db 0x30
+	goto .leave
+; 4: COND at 14:10
+.node_4:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_6
+	goto .node_5
+; 5: EXPR at 14:22
+.node_5:
+	const 1
+	db 0x31
+	goto .leave
+; 6: COND at 15:10
+.node_6:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_8
+	goto .node_7
+; 7: EXPR at 15:22
+.node_7:
+	const 1
+	db 0x32
+	goto .leave
+; 8: COND at 16:10
+.node_8:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x3, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_10
+	goto .node_9
+; 9: EXPR at 16:22
+.node_9:
+	const 1
+	db 0x33
+	goto .leave
+; 10: COND at 17:10
+.node_10:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_12
+	goto .node_11
+; 11: EXPR at 17:22
+.node_11:
+	const 1
+	db 0x34
+	goto .leave
+; 12: COND at 18:10
+.node_12:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_14
+	goto .node_13
+; 13: EXPR at 18:22
+.node_13:
+	const 1
+	db 0x35
+	goto .leave
+; 14: COND at 19:10
+.node_14:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x6, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_16
+	goto .node_15
+; 15: EXPR at 19:22
+.node_15:
+	const 1
+	db 0x36
+	goto .leave
+; 16: COND at 20:10
+.node_16:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x7, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_18
+	goto .node_17
+; 17: EXPR at 20:22
+.node_17:
+	const 1
+	db 0x37
+	goto .leave
+; 18: COND at 21:10
+.node_18:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_20
+	goto .node_19
+; 19: EXPR at 21:22
+.node_19:
+	const 1
+	db 0x38
+	goto .leave
+; 20: COND at 22:10
+.node_20:
+	get fp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	const 4
+	db 0x9, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_22
+	goto .node_21
+; 21: EXPR at 22:22
+.node_21:
+	const 1
+	db 0x39
+	goto .leave
+; 22: EXPR at 23:10
+.node_22:
+	const 1
+	db 0x20
+	goto .leave
+.leave:
+	store 1
+	set fp
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	add
+	set sp
+	ret
+; constants
+; test.in:24
+write_ulong:
+	get sp
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	get sp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	add
+	set fp
+	get fp
+; 1: EXPR at 26:26
+.node_1:
+	goto .node_2
+; 2: COND at 27:5
+.node_2:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp eq
+	ifz .node_4
+	goto .node_3
+; 3: EXPR at 28:9
+.node_3:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	dd .const_1
+	call write_str
+	goto .leave
+; 4: COND at 32:5
+.node_4:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0xa, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	div
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp ne
+	ifz .node_6
+	goto .node_5
+; 5: EXPR at 33:9
+.node_5:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0xa, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	div
+	call write_ulong
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_6
+; 6: EXPR at 36:5
+.node_6:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0xa, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	rem
+	add
+	trunc 1
+	call digit_to_char
+	call write
+	goto .leave
+.return_void:
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 2
+.leave:
+	store 2
+	set fp
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	ret
+; constants
+.const_1:
+	db 0x1, 0x0, 0x0, 0x0, 0x30
+; test.in:37
+write_long:
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	get sp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	add
+	set fp
+	get fp
+; 1: EXPR at 39:24
+.node_1:
+	goto .node_2
+; 2: COND at 40:5
+.node_2:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp lt
+	ifz .node_5
+	goto .node_3
+; 3: EXPR at 41:9
+.node_3:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 1
+	db 0x2d
+	call write
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_4
+; 4: EXPR at 42:9
+.node_4:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	sub
+	store 4
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_5
+; 5: EXPR at 45:11
+.node_5:
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	store 4
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_6
+; 6: EXPR at 46:5
+.node_6:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	add
+	call write_ulong
+	goto .leave
+.return_void:
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 2
+.leave:
+	store 2
+	set fp
+	get sp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	add
+	set sp
+	ret
+; constants
+; test.in:49
+read_ulong:
+	get sp
+	const 4
+	db 0x9, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	get sp
+	const 4
+	db 0xd, 0x0, 0x0, 0x0
+	add
+	set fp
+	get fp
+; 1: EXPR at 49:20
+.node_1:
+	goto .node_2
+; 2: EXPR at 50:11
+.node_2:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	store 4
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_3
+; 3: COND at 52:5
+.node_3:
+	const 1
+	db 0xff
+	sext 1
+	ifz .node_8
+	goto .node_4
+; 4: EXPR at 53:14
+.node_4:
+	get fp
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	set sp
+	call read
+	call ord
+	store 1
+	get fp
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	sub
+	load 1
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_5
+; 5: COND at 56:9
+.node_5:
+	get fp
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 1
+	db 0x30
+	call ord
+	zext 1
+	cmp ge
+	get fp
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 1
+	db 0x39
+	call ord
+	zext 1
+	cmp le
+	andb
+	ifz .node_8
+	goto .node_6
+; 6: EXPR at 57:13
+.node_6:
+	get fp
+	const 4
+	db 0x9, 0x0, 0x0, 0x0
+	sub
+	get fp
+	const 4
+	db 0x5, 0x0, 0x0, 0x0
+	sub
+	load 1
+	zext 1
+	get sp
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 1
+	db 0x30
+	call ord
+	zext 1
+	sub
+	trunc 1
+	zext 1
+	store 4
+	get fp
+	const 4
+	db 0x9, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_7
+; 7: EXPR at 62:9
+.node_7:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0xa, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	mul
+	get fp
+	const 4
+	db 0x9, 0x0, 0x0, 0x0
+	sub
+	load 4
+	add
+	store 4
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_3
+; 8: EXPR at 65:5
+.node_8:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	goto .leave
+.return_void:
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+.leave:
+	store 4
+	set fp
+	get sp
+	const 4
+	db 0x9, 0x0, 0x0, 0x0
+	add
+	set sp
+	ret
+; constants
+; test1.in:2
+increase_size:
+	get sp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	get sp
+	const 4
+	db 0x18, 0x0, 0x0, 0x0
+	add
+	set fp
+	get fp
+; 1: EXPR at 2:42
+.node_1:
+	goto .node_2
+; 2: EXPR at 3:11
+.node_2:
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	call get_int_array_size
+	store 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_3
+; 3: COND at 5:5
+.node_3:
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	cmp ge
+	ifz .node_5
+	goto .node_4
+; 4: EXPR at 6:9
+.node_4:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	goto .leave
+; 5: EXPR at 10:11
+.node_5:
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	mul
+	call new_int_array
+	store 4
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_6
+; 6: EXPR at 12:11
+.node_6:
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	store 4
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_7
+; 7: COND at 13:5
+.node_7:
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	cmp lt
+	ifz .node_10
+	goto .node_8
+; 8: EXPR at 14:9
+.node_8:
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	store 2
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_9
+; 9: EXPR at 15:9
+.node_9:
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	add
+	store 4
+	get fp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_7
+; 10: EXPR at 18:5
+.node_10:
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	goto .leave
+.leave:
+	store 4
+	set fp
+	get sp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	add
+	set sp
+	ret
+; constants
+; test1.in:19
+main:
+	get sp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	get sp
+	const 4
+	db 0x14, 0x0, 0x0, 0x0
+	add
+	set fp
+	get fp
+; 1: EXPR at 21:8
+.node_1:
+	goto .node_2
+; 2: EXPR at 22:5
+.node_2:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	dd .const_1
+	call write_str
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_3
+; 3: EXPR at 23:11
+.node_3:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	call read_ulong
+	store 4
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_4
+; 4: EXPR at 25:11
+.node_4:
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	call new_int_array
+	store 4
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_5
+; 5: EXPR at 26:5
+.node_5:
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	trunc 2
+	store 2
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_6
+; 6: EXPR at 27:5
+.node_6:
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	trunc 2
+	store 2
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_7
+; 7: EXPR at 29:11
+.node_7:
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	store 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_8
+; 8: COND at 31:5
+.node_8:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	cmp gt
+	ifz .return_void
+	goto .node_9
+; 9: EXPR at 32:9
+.node_9:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	dd .const_2
+	call write_str
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_10
+; 10: EXPR at 33:15
+.node_10:
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	call read_ulong
+	store 4
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_11
+; 11: EXPR at 35:9
+.node_11:
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	add
+	call increase_size
+	store 4
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_12
+; 12: COND at 37:9
+.node_12:
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	cmp le
+	ifz .node_15
+	goto .node_13
+; 13: EXPR at 38:13
+.node_13:
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	sub
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	sext 2
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	sub
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	sext 2
+	add
+	trunc 2
+	store 2
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_14
+; 14: EXPR at 39:13
+.node_14:
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	add
+	store 4
+	get fp
+	const 4
+	db 0xc, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_12
+; 15: EXPR at 42:9
+.node_15:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	dd .const_3
+	call write_str
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_16
+; 16: EXPR at 43:9
+.node_16:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	get fp
+	const 4
+	db 0x8, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get fp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	mul
+	add
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	load 2
+	sext 2
+	call write_long
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_17
+; 17: EXPR at 44:9
+.node_17:
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	sub
+	set sp
+	const 4
+	dd .const_4
+	call write_str
+	get sp
+	const 4
+	db 0x2, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_18
+; 18: EXPR at 45:9
+.node_18:
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	const 4
+	db 0x1, 0x0, 0x0, 0x0
+	trunc 1
+	zext 1
+	sub
+	store 4
+	get fp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	sub
+	load 4
+	get sp
+	const 4
+	db 0x4, 0x0, 0x0, 0x0
+	add
+	set sp
+	goto .node_8
+.return_void:
+	const 4
+	db 0x0, 0x0, 0x0, 0x0
+	trunc 2
+.leave:
+	store 2
+	set fp
+	get sp
+	const 4
+	db 0x10, 0x0, 0x0, 0x0
+	add
+	set sp
+	ret
+; constants
+.const_1:
+	db 0x13, 0x0, 0x0, 0x0, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x20, 0x6f, 0x66, 0x20, 0x71, 0x75, 0x65, 0x72, 0x69, 0x65, 0x73, 0x3a, 0x20
+.const_2:
+	db 0x7, 0x0, 0x0, 0x0, 0x51, 0x75, 0x65, 0x72, 0x79, 0x3a, 0x20
+.const_3:
+	db 0x8, 0x0, 0x0, 0x0, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x3a, 0x20
+.const_4:
+	db 0x1, 0x0, 0x0, 0x0, 0xa
+; builtin: char read();
+read:
+	get sp
+	in
+	store 1
+	ret
+; builtin int write(char c);
+write:
+	out
+	ret
+; builtin int[] new_int_array(ulong size);
+new_int_array:
+	get fp
+	get sp
+	set fp
+	get fp
+	const 4
+	db 8, 0, 0, 0
+	add
+	const 4
+	dd heap_end
+	load 4
+	store 4
+	const 4
+	dd heap_end
+	load 4
+	get fp
+	const 4
+	db 4, 0, 0, 0
+	add
+	load 4
+	store 4
+	const 4
+	dd heap_end
+	const 4
+	dd heap_end
+	load 4
+	get fp
+	const 4
+	db 4, 0, 0, 0
+	add
+	load 4
+	const 4
+	db 2, 0, 0, 0
+	mul
+	const 4
+	db 4, 0, 0, 0
+	add
+	add
+	store 4
+	set fp
+	get sp
+	const 4
+	db 4, 0, 0, 0
+	add
+	set sp
+	ret
+; builtin ulong get_int_array_size(int[] array);
+get_int_array_size:
+	load 4
+	get sp
+	const 4
+	db 4, 0, 0, 0
+	add
+	get sp
+	const 4
+	db 4, 0, 0, 0
+	add
+	load 4
+	store 4
+	get sp
+	const 4
+	db 4, 0, 0, 0
+	add
+	set sp
+	ret
+; builtin int write_str(string str);
+write_str:
+	get sp
+	load 4
+	load 4
+	get fp
+	get sp
+	set fp
+	get fp
+	const 4
+	db 8, 0, 0, 0
+	add
+	get fp
+	const 4
+	db 8, 0, 0, 0
+	add
+	load 4
+	const 4
+	db 4, 0, 0, 0
+	add
+	store 4
+	goto .loop_cond
+.loop:
+	get fp
+	const 4
+	db 8, 0, 0, 0
+	add
+	load 4
+	load 1
+	out
+	get fp
+	const 4
+	db 8, 0, 0, 0
+	add
+	get fp
+	const 4
+	db 8, 0, 0, 0
+	add
+	load 4
+	const 4
+	db 1, 0, 0, 0
+	add
+	store 4
+	get fp
+	const 4
+	db 4, 0, 0, 0
+	add
+	get fp
+	const 4
+	db 4, 0, 0, 0
+	add
+	load 4
+	const 4
+	db 1, 0, 0, 0
+	sub
+	store 4
+.loop_cond:
+	get fp
+	const 4
+	db 4, 0, 0, 0
+	add
+	load 4
+	const 4
+	db 0, 0, 0, 0
+	cmp eq
+	ifz .loop
+	set fp
+	get sp
+	const 4
+	db 8, 0, 0, 0
+	add
+	set sp
+	ret
+; builtin byte ord(char c);
+ord:
+	sext 2
+	trunc 1
+	ret
+; builtin char chr(byte c);
+chr:
+	goto ord
+; heap
+heap_end:
+	dd heap
+heap:

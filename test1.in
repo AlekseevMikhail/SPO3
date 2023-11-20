@@ -1,0 +1,47 @@
+
+int[] increase_size(int[] x, ulong size) {
+    ulong real_size = get_int_array_size(x);
+
+    if (real_size >= size) {
+        x;
+        break;
+    }
+
+    int[] result = new_int_array(real_size * 2);
+
+    ulong i = 0;
+    while (i < real_size) {
+        result[i] = x[i];
+        ++i;
+    }
+
+    result;
+}
+
+main() {
+    write_str("Number of queries: ");
+    ulong cnt = read_ulong();
+
+    int[] table = new_int_array(2);
+    table[0] = 1;
+    table[1] = 1;
+
+    ulong filled = 2;
+
+    while (cnt > 0) {
+        write_str("Query: ");
+        ulong q = read_ulong();
+
+        table = increase_size(table, q + 1);
+
+        while (filled <= q) {
+            table[filled] = table[filled - 1] + table[filled - 2];
+            ++filled;
+        }
+
+        write_str("Result: ");
+        write_long(table[q]);
+        write_str("\n");
+        --cnt;
+    }
+}
